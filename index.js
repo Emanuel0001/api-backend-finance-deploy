@@ -21,7 +21,6 @@ const client = new Client({
   port: PORT_CLIENT,
 })
 client.connect()
-
 app.use(cors());
 const SECRET = process.env.SECRET
 const verifyJWT = (req, res, next) => {
