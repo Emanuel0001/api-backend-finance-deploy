@@ -21,6 +21,7 @@ const client = new Client({
   port: PORT_CLIENT,
 })
 client.connect()
+
 app.use(cors());
 const SECRET = process.env.SECRET
 const verifyJWT = (req, res, next) => {
@@ -43,7 +44,6 @@ app.post('/login', (req, res) => {
   client.query(`select * from usuarios WHERE email = $1 AND password = $2`, [email, password])
     .then(results => {
       const resultado = results
-      console.log("enviou resposta");
       if (resultado.rowCount === 1) {
         const nome = results.rows[0].name;
         const token = jwt.sign({ userId: 1, email: email }, SECRET, { expiresIn: '1h' })
