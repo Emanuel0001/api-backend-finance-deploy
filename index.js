@@ -1,3 +1,4 @@
+const emailvalidator = require("email-validator")
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -212,21 +213,18 @@ app.post('/deletRowTable', (req, res) => {
 })
 
 
-app.post('/client', (req, res) => {console.log('chegando bem')
+app.post('/client', (req, res) => {
     const name = req.body.name;
     const email = req.body.email;
     const cpf = req.body.cpf;
     const phone = req.body.phone;
     const created_at = req.body.data;
-
-    console.log(name,email,cpf,phone,created_at)
-    res.status(200);
+    if (emailvalidator.validate(email)) {
    client.query(`select * from client WHERE email = $1`, [email])
         .then(results => {
             const resultadoBuscaEmail = results
             if (resultadoBuscaEmail.rowCount === 1) {
                 res.json({ "error": "E-mail já utilizado" })
-                console.log('ja cadastrado')
             } else {
                     client.query(`INSERT INTO client (name,email,cpf,phone,created_at) VALUES ($1, $2, $3, $4, $5)`, [name, email, cpf, phone, created_at])
                         .then(results => {
@@ -239,9 +237,11 @@ app.post('/client', (req, res) => {console.log('chegando bem')
                         })
             }
         });
-        
+    } else {
+        return res.json({"message": "email inválido."})
+        console.log('invalidMail')
+    }
 })
-
 
 app.post('/client/interval', (req, res) => { 
     const initialDate = req.body.initialDate;
