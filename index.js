@@ -212,6 +212,52 @@ app.post('/deletRowTable', (req, res) => {
 })
 
 
+app.post('/client', (req, res) => {console.log('chegando bem')
+    const name = req.body.name;
+    const email = req.body.email;
+    const cpf = req.body.cpf;
+    const phone = req.body.phone;
+    const created_at = req.body.data;
+
+    console.log(name,email,cpf,phone,created_at)
+    res.status(200);
+   client.query(`select * from client WHERE email = $1`, [email])
+        .then(results => {
+            const resultadoBuscaEmail = results
+            if (resultadoBuscaEmail.rowCount === 1) {
+                res.json({ "error": "E-mail já utilizado" })
+                console.log('ja cadastrado')
+            } else {
+                    client.query(`INSERT INTO client (name,email,cpf,phone,created_at) VALUES ($1, $2, $3, $4, $5)`, [name, email, cpf, phone, created_at])
+                        .then(results => {
+                            const resultado = results
+                            if (resultado.rowCount === 1) {
+                                return res.json({ "message": "Registrado com sucesso" });
+                            } else {
+                                return res.json({ "error": "Erro ao Registrar" });
+                            }
+                        })
+            }
+        });
+        
+})
+
+
+app.post('/client/interval', (req, res) => { 
+    const initialDate = req.body.initialDate;
+    const finalDate = req.body.finalDate;
+    res.status(200)
+    console.log('chegou',initialDate,finalDate)
+    client.query(`select * from client WHERE created_at BETWEEN $1 AND $2`, [initialDate,finalDate])
+    .then(results => {
+          const resultado = results.rows
+          console.log(resultado)
+          return res.json({"resultado" : resultado});
+     })
+})
+
+
+
 app.listen(port, () => {
   console.log('Rodando na porta', port)
 })
